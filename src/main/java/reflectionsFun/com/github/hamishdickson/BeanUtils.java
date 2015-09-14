@@ -11,12 +11,13 @@ public class BeanUtils {
 
         Method[] declaredMethods = obj.getDeclaredMethods();
 
-        System.out.println("Declared methods:");
         for (Method declaredMethod: declaredMethods) {
-            System.out.println("Method name: " + declaredMethod.getName() + " found, type " + declaredMethod.getReturnType());
             try {
-                if (declaredMethod.invoke(o) == null || (declaredMethod.invoke(o) instanceof List && ((List) declaredMethod.invoke(o)).size() < 1))
-                    return false;
+                if (isNotValid(o, declaredMethod)) {
+                    if (hasNoJsonIgnoreAnnotation(declaredMethod)) {
+                        return false;
+                    }
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
@@ -25,5 +26,21 @@ public class BeanUtils {
         }
 
         return true;
+    }
+
+    private boolean hasNoJsonIgnoreAnnotation(Method declaredMethod) {
+        if (hasNoAnnotation(declaredMethod)) {
+            return true;
+        } else {
+            return declaredMethod.getDeclaredAnnotations().length > 0 && declaredMethod.getDeclaredAnnotations()[0].toString().equals("@JsonIgnore");
+        }
+    }
+
+    private boolean hasNoAnnotation(Method declaredMethod) {
+        return declaredMethod.getDeclaredAnnotations().length < 1;
+    }
+
+    private boolean isNotValid(Object o, Method declaredMethod) throws IllegalAccessException, InvocationTargetException {
+        return declaredMethod.invoke(o) == null || (declaredMethod.invoke(o) instanceof List && ((List) declaredMethod.invoke(o)).size() < 1);
     }
 }

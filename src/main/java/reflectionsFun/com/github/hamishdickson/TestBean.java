@@ -1,5 +1,7 @@
 package reflectionsFun.com.github.hamishdickson;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 public class TestBean {
@@ -18,6 +20,7 @@ public class TestBean {
         this.integerList = integerList;
     }
 
+    @JsonIgnore
     public String getString1() {
         return string1;
     }
